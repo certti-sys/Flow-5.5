@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { LessonSidebar } from "@/components/LessonSidebar";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { ChevronLeft, Play, Clock, BookOpen, User, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -184,7 +185,7 @@ const Course = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/80" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
-        <div className="relative container mx-auto px-4 py-8 md:py-12">
+        <PageContainer className="relative py-8 md:py-12">
           {/* Back Button */}
           <Link to="/dashboard" className="inline-block mb-6">
             <Button variant="ghost" size="sm" className="gap-2 hover:bg-white/10 text-muted-foreground hover:text-foreground">
@@ -264,12 +265,13 @@ const Course = () => {
               </div>
             )}
           </div>
-        </div>
+        </PageContainer>
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      <main>
+        <PageContainer className="py-6 md:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Video Section */}
           <div className="lg:col-span-2 space-y-5">
             {currentLesson ? (
@@ -359,6 +361,7 @@ const Course = () => {
             </div>
           </div>
         </div>
+        </PageContainer>
       </main>
     </div>
   );

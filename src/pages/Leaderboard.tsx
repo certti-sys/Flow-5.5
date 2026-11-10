@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { AdminHeader } from "@/components/admin/AdminHeader";
 
 import React from "react";
 
@@ -130,65 +132,60 @@ const Leaderboard = () => {
 
   if (error) {
     return (
-      <div className="p-8 max-w-5xl mx-auto flex flex-col justify-center items-center h-64 border border-destructive/20 rounded-xl bg-destructive/10 mt-8">
-        <h2 className="text-xl font-bold text-destructive mb-2">Erro ao carregar o ranking</h2>
-        <p className="font-mono text-xs text-muted-foreground bg-black/40 p-2 rounded w-full overflow-auto">
-          {error instanceof Error ? error.message : JSON.stringify(error)}
-        </p>
-      </div>
+      <PageContainer className="py-8">
+        <div className="p-8 flex flex-col justify-center items-center h-64 border border-destructive/20 rounded-xl bg-destructive/10 mt-8">
+          <h2 className="text-xl font-bold text-destructive mb-2">Erro ao carregar o ranking</h2>
+          <p className="font-mono text-xs text-muted-foreground bg-black/40 p-2 rounded w-full overflow-auto">
+            {error instanceof Error ? error.message : JSON.stringify(error)}
+          </p>
+        </div>
+      </PageContainer>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen p-8 max-w-7xl mx-auto space-y-8 animate-pulse">
-        <div className="h-20 bg-card rounded-lg w-full max-w-sm mb-12"></div>
-        <div className="flex flex-col md:flex-row justify-center items-end gap-6 mb-16">
-          <div className="h-64 bg-card rounded-2xl w-full md:w-64"></div>
-          <div className="h-80 bg-card rounded-2xl w-full md:w-72"></div>
-          <div className="h-56 bg-card rounded-2xl w-full md:w-64"></div>
+      <PageContainer className="py-8">
+        <div className="space-y-8 animate-pulse">
+          <div className="h-20 bg-card rounded-lg w-full max-w-sm mb-12"></div>
+          <div className="flex flex-col md:flex-row justify-center items-end gap-6 mb-16">
+            <div className="h-64 bg-card rounded-2xl w-full md:w-64"></div>
+            <div className="h-80 bg-card rounded-2xl w-full md:w-72"></div>
+            <div className="h-56 bg-card rounded-2xl w-full md:w-64"></div>
+          </div>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-16 bg-card rounded-xl w-full"></div>
+            ))}
+          </div>
         </div>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-16 bg-card rounded-xl w-full"></div>
-          ))}
-        </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="pb-24">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 py-8 px-4 md:px-8 max-w-5xl mx-auto mt-6">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-primary/10 rounded-xl">
-              <Medal className="w-6 h-6 text-primary" />
-            </div>
-            <h1 className="text-3xl font-black tracking-tight">
-              Ranking {period === 'global' ? 'Global' : period === 'weekly' ? 'Semanal' : 'Mensal'}
-            </h1>
-          </div>
-          <p className="text-muted-foreground mt-2 ml-14">
-            Compare seu progresso e mantenha sua ofensiva alta para subir na classificação.
-          </p>
-        </div>
+    <PageContainer className="pb-24 space-y-8">
+      <AdminHeader
+        title={`Ranking ${period === 'global' ? 'Global' : period === 'weekly' ? 'Semanal' : 'Mensal'}`}
+        description="Compare seu progresso e mantenha sua ofensiva alta para subir na classificação."
+        showSearch={false}
+        filters={
+          <Tabs
+            defaultValue="global"
+            value={period}
+            onValueChange={setPeriod}
+            className="w-full md:w-auto"
+          >
+            <TabsList className="grid grid-cols-3 w-full md:w-[400px] h-11 bg-muted/20 backdrop-blur-md border border-white/5">
+              <TabsTrigger value="weekly" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Semanal</TabsTrigger>
+              <TabsTrigger value="monthly" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Mensal</TabsTrigger>
+              <TabsTrigger value="global" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Global</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        }
+      />
 
-        <Tabs 
-          defaultValue="global" 
-          value={period} 
-          onValueChange={setPeriod}
-          className="w-full md:w-auto"
-        >
-          <TabsList className="grid grid-cols-3 w-full md:w-[400px] h-11 bg-muted/20 backdrop-blur-md border border-white/5">
-            <TabsTrigger value="weekly" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Semanal</TabsTrigger>
-            <TabsTrigger value="monthly" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Mensal</TabsTrigger>
-            <TabsTrigger value="global" className="text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Global</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 md:px-8 mt-4">
+      <div className="mt-4">
         {/* Podium Section */}
         {podiumData.length > 0 && (
           <div className="flex flex-col md:flex-row justify-center items-end gap-6 mb-16 px-4 pt-10">
@@ -278,7 +275,7 @@ const Leaderboard = () => {
           </div>
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

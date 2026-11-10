@@ -63,10 +63,10 @@ export function ViewStudentProgressModal({
 
       if (courseDetailsError) throw courseDetailsError;
 
-      // Get user progress
+      // Get user progress (user_progress stores lesson_id, not course_id)
       const { data: progress, error: progressError } = await supabase
         .from("user_progress")
-        .select("lesson_id, course_id, completed")
+        .select("lesson_id, completed")
         .eq("user_id", student.id)
         .eq("completed", true);
 
@@ -78,8 +78,8 @@ export function ViewStudentProgressModal({
       return courses.map((course: any) => {
         const allLessons = course.modules.flatMap((m: any) => m.lessons);
         const totalLessons = allLessons.length;
-        const completedLessons = progress.filter((p: any) => 
-          p.course_id === course.id
+        const completedLessons = allLessons.filter((lesson: any) =>
+          completedLessonIds.has(lesson.id)
         ).length;
         const percentage =
           totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;

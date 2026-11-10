@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { ContentHeader } from "@/components/ContentHeader";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -87,9 +88,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="min-h-screen flex flex-col w-full overflow-y-auto">
           <ContentHeader />
           <main className="flex-1 pb-20">
-            <div className="container mx-auto p-4 sm:p-6">
+            <PageContainer>
               {children}
-            </div>
+            </PageContainer>
           </main>
         </div>
       </SidebarProvider>
@@ -104,9 +105,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex-1 flex flex-col overflow-hidden">
           <ContentHeader />
           <main className="flex-1 overflow-y-auto scrollbar-styled">
-            <div className="container mx-auto p-6">
+            <PageContainer>
               {children}
-            </div>
+            </PageContainer>
           </main>
         </div>
       </div>

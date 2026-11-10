@@ -85,6 +85,10 @@ export const usePlatformSettings = () => {
         .from('platform_settings')
         .select('*')
         .eq('is_active', true)
+        // Defesa extra: se houver mais de um registro ativo, usa o mais antigo
+        // (canônico, com os dados de branding/banner) em vez de falhar.
+        .order('created_at', { ascending: true })
+        .limit(1)
         .maybeSingle();
 
       if (error) throw error;

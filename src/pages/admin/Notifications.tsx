@@ -87,7 +87,7 @@ export default function Notifications() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6 pb-20 max-w-7xl mx-auto"
+      className="space-y-6 pb-20"
     >
       {/* Header */}
       <AdminHeader

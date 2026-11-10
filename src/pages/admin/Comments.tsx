@@ -180,7 +180,7 @@ const Comments = () => {
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-[32px] pb-20 max-w-7xl mx-auto"
+      className="space-y-[32px] pb-20"
     >
       <motion.div variants={item} className="flex flex-col md:flex-row justify-between gap-4">
         <div className="flex flex-col space-y-1">

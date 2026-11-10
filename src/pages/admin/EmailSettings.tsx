@@ -163,7 +163,7 @@ export default function EmailSettings() {
   const stats = { sent: logs?.filter(l => l.status === "sent").length || 0, failed: logs?.filter(l => l.status !== "sent").length || 0, total: logs?.length || 0 };
 
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20 max-w-7xl mx-auto">
+    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20">
       {/* Header */}
       <motion.div variants={itemAnim} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

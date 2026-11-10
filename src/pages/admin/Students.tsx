@@ -257,7 +257,7 @@ export default function AdminStudents() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-6 pb-20 max-w-7xl mx-auto overflow-visible"
+      className="space-y-6 pb-20 overflow-visible"
     >
       <AdminHeader
         title="Gerenciar Alunos"

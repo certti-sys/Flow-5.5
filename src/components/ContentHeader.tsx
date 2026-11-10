@@ -1,4 +1,4 @@
-import { PanelLeft, LayoutGrid, User as UserIcon, Headphones, GraduationCap, LogOut as LogOutIcon, ChevronDown, Trophy } from "lucide-react";
+import { PanelLeft, PanelRight, LayoutGrid, User as UserIcon, Headphones, GraduationCap, LogOut as LogOutIcon, ChevronDown, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
@@ -63,7 +63,7 @@ export function ContentHeader({
   showNotifications = true,
   showAvatar = true,
 }: ContentHeaderProps) {
-  const { toggleSidebar, state } = useSidebar();
+  const { toggleSidebar, state, open } = useSidebar();
   const breadcrumbs = useBreadcrumbs();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -71,6 +71,7 @@ export function ContentHeader({
   const { settings } = usePlatformSettingsContext();
 
   const isCollapsed = state === "collapsed";
+  const isSidebarOpen = open;
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -117,9 +118,21 @@ export function ContentHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-white/[0.1]">
+    <header
+      className={cn(
+        "sticky top-0 z-40 transition-colors duration-300",
+        isSidebarOpen
+          ? "bg-transparent! backdrop-blur-none! border-none"
+          : "bg-background/95 backdrop-blur-md border-b border-white/[0.1]"
+      )}
+    >
       <div className="px-4 md:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 items-center h-16 md:h-14 gap-3">
+        <div
+          className={cn(
+            "grid grid-cols-2 items-center h-16 md:h-14 gap-3",
+            isSidebarOpen ? "md:grid-cols-2" : "md:grid-cols-3"
+          )}
+        >
           {/* Column 1: Sidebar toggle + dynamic logo + breadcrumbs */}
           <div className="flex items-center gap-3 min-w-0">
             <Button
@@ -128,8 +141,12 @@ export function ContentHeader({
               className="h-9 w-9 shrink-0 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/[0.08] text-white/80"
               onClick={toggleSidebar}
             >
-              <PanelLeft className="h-4.5 w-4.5" />
-              <span className="sr-only">Toggle sidebar</span>
+              {isSidebarOpen ? (
+                <PanelRight className="h-4.5 w-4.5" />
+              ) : (
+                <PanelLeft className="h-4.5 w-4.5" />
+              )}
+              <span className="sr-only">{isSidebarOpen ? "Recolher sidebar" : "Expandir sidebar"}</span>
             </Button>
 
             {/* Dynamic Logo (shows when sidebar collapsed) */}
@@ -179,37 +196,39 @@ export function ContentHeader({
             </Breadcrumb>
           </div>
 
-          {/* Column 2: Centered Navigation Links (same as Navbar) */}
-          <div className="hidden md:flex items-center justify-center gap-2">
-            <div className="flex items-center gap-0.5 p-1 bg-white/5 rounded-xl border border-white/[0.08]">
-              <NavItem
-                to="/dashboard"
-                icon={<LayoutGrid className="w-4 h-4" />}
-                label="Cursos"
-                isActive={location.pathname === "/dashboard"}
-              />
-              <NavItem
-                to="/perfil"
-                icon={<UserIcon className="w-4 h-4" />}
-                label="Perfil"
-                isActive={location.pathname === "/perfil"}
-              />
-              <NavItem
-                to="/ranking"
-                icon={<Trophy className="w-4 h-4" />}
-                label="Ranking"
-                isActive={location.pathname === "/ranking"}
-              />
-              {isAdmin && (
+          {/* Column 2: Centered Navigation Links (only when sidebar is collapsed) */}
+          {!isSidebarOpen && (
+            <div className="hidden md:flex items-center justify-center gap-2">
+              <div className="flex items-center gap-0.5 p-1 bg-white/5 rounded-xl border border-white/[0.08]">
                 <NavItem
-                  to="/admin"
-                  icon={<Headphones className="w-4 h-4" />}
-                  label="Admin"
-                  isActive={location.pathname.startsWith("/admin")}
+                  to="/dashboard"
+                  icon={<LayoutGrid className="w-4 h-4" />}
+                  label="Cursos"
+                  isActive={location.pathname === "/dashboard"}
                 />
-              )}
+                <NavItem
+                  to="/perfil"
+                  icon={<UserIcon className="w-4 h-4" />}
+                  label="Perfil"
+                  isActive={location.pathname === "/perfil"}
+                />
+                <NavItem
+                  to="/ranking"
+                  icon={<Trophy className="w-4 h-4" />}
+                  label="Ranking"
+                  isActive={location.pathname === "/ranking"}
+                />
+                {isAdmin && (
+                  <NavItem
+                    to="/admin"
+                    icon={<Headphones className="w-4 h-4" />}
+                    label="Admin"
+                    isActive={location.pathname.startsWith("/admin")}
+                  />
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Column 3: Right Side Actions (same as Navbar) */}
           <div className="flex items-center justify-end gap-2 md:gap-3">

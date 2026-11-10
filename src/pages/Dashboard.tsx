@@ -95,9 +95,15 @@ const Dashboard = () => {
       0
     ) || 0;
 
-    // Calculate completed lessons for each course using the direct course_id
+    // Calculate completed lessons for this course by lesson_id (user_progress has no course_id)
+    const lessonIds = new Set<string>(
+      course.modules?.flatMap((module: any) =>
+        (module.lessons || []).map((lesson: any) => lesson.id)
+      ) || []
+    );
+
     const completedLessons = userProgress.filter(
-      (p: any) => p.course_id === course.id
+      (p: any) => p.lesson_id && lessonIds.has(p.lesson_id)
     ).length;
 
     const progress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;

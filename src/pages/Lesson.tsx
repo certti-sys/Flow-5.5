@@ -40,8 +40,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useHasAccessToCourse } from "@/hooks/useHasAccessToCourse";
 import { useGamification, Achievement } from "@/hooks/useGamification";
 import { AchievementUnlockedModal } from "@/components/gamification/AchievementUnlockedModal";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { Badge } from "@/components/ui/badge";
-import { AdminHeader } from "@/components/admin/AdminHeader";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
@@ -618,28 +618,12 @@ const Lesson = () => {
 
   return (
     <div className="min-h-screen">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-20 space-y-6"
-      >
-        <AdminHeader
-          title="Área de Aulas"
-          description="Assista às aulas, acesse os materiais e interaja com a comunidade do curso."
-          showSearch={false}
-          actionButton={
-            <Link to="/dashboard">
-              <Button
-                variant="outline"
-                className="glass-card border-white/10 hover:bg-white/5 h-[44px] px-6 rounded-[12px] font-semibold text-[13px] tracking-tight"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Meus Cursos
-              </Button>
-            </Link>
-          }
-        />
-
+      <PageContainer>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="pb-20 space-y-6"
+        >
         {/* Hero Header do Curso */}
         {lessonData.modules?.courses && (
           <div className="glass-card relative overflow-hidden rounded-[24px] border-white/10">
@@ -656,39 +640,51 @@ const Lesson = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
             <div className="relative p-6 md:p-8">
-              <div className="space-y-3 max-w-3xl">
-                {/* Category Badge */}
-                <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-xs uppercase tracking-wider font-bold">
-                  {lessonData.modules.courses.category}
-                </Badge>
+              <div className="flex flex-col-reverse gap-4 md:flex-row md:items-start md:justify-between md:gap-6">
+                <div className="space-y-3 max-w-3xl min-w-0">
+                  {/* Category Badge */}
+                  <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-xs uppercase tracking-wider font-bold">
+                    {lessonData.modules.courses.category}
+                  </Badge>
 
-                <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight">
-                  {lessonData.modules.courses.title}
-                </h1>
+                  <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight">
+                    {lessonData.modules.courses.title}
+                  </h1>
 
-                {lessonData.modules.courses.description && (
-                  <p className="text-muted-foreground text-[14px] line-clamp-2 max-w-2xl">
-                    {lessonData.modules.courses.description}
-                  </p>
-                )}
+                  {lessonData.modules.courses.description && (
+                    <p className="text-muted-foreground text-[14px] line-clamp-2 max-w-2xl">
+                      {lessonData.modules.courses.description}
+                    </p>
+                  )}
 
-                {/* Meta Info */}
-                <div className="flex flex-wrap items-center gap-4 text-[12px] text-muted-foreground pt-1">
-                  <div className="flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-primary" />
-                    <span>{lessonData.modules.courses.instructor}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5 text-primary" />
-                    <span>
-                      {modules.reduce((acc, mod) => acc + (mod.lessons?.length || 0), 0)} aulas
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    <span>{lessonData.modules.courses.duration}</span>
+                  {/* Meta Info */}
+                  <div className="flex flex-wrap items-center gap-4 text-[12px] text-muted-foreground pt-1">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-primary" />
+                      <span>{lessonData.modules.courses.instructor}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-primary" />
+                      <span>
+                        {modules.reduce((acc, mod) => acc + (mod.lessons?.length || 0), 0)} aulas
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-primary" />
+                      <span>{lessonData.modules.courses.duration}</span>
+                    </div>
                   </div>
                 </div>
+
+                <Link to="/dashboard" className="shrink-0 self-start relative z-20">
+                  <Button
+                    variant="outline"
+                    className="glass-card bg-black/30 border-white/10 hover:bg-white/10 h-10 md:h-[44px] px-4 md:px-6 rounded-[12px] font-semibold text-[13px] tracking-tight"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Meus Cursos
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -838,6 +834,7 @@ const Lesson = () => {
           </div>
         </div>
       </motion.div>
+      </PageContainer>
 
       {/* Achievement Modal */}
       {unlockedAchievement && (

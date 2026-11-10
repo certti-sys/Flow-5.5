@@ -232,7 +232,7 @@ export default function AdminCourses() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="space-y-6 pb-20 max-w-7xl mx-auto"
+      className="space-y-6 pb-20"
     >
       <AdminHeader
         title="Gestão de Cursos"

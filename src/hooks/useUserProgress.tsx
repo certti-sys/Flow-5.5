@@ -28,11 +28,13 @@ export const useUserProgress = () => {
     );
   };
 
-  // Helper function to get progress for a course
-  const getCourseProgress = (courseId: string, totalLessons: number) => {
+  // Helper function to get progress for a course from its lesson ids
+  const getCourseProgress = (lessonIds: string[]) => {
     const completedLessons = userProgress.filter((p) => {
-      return p.course_id === courseId && p.completed;
+      return p.completed && p.lesson_id && lessonIds.includes(p.lesson_id);
     }).length;
+
+    const totalLessons = lessonIds.length;
 
     const progress = totalLessons > 0 
       ? Math.round((completedLessons / totalLessons) * 100) 

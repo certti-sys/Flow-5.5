@@ -89,7 +89,7 @@ export default function WebhookHub() {
   };
 
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20 max-w-7xl mx-auto">
+    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20">
       {/* Header */}
       <AdminHeader
         title="Hub de Webhooks"

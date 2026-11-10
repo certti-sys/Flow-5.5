@@ -92,7 +92,7 @@ export default function MonitoringSettings() {
   };
 
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20 max-w-7xl mx-auto">
+    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6 pb-20">
       <AdminHeader
         title="Monitoramento e Resiliência"
         description="Gerencie a saúde técnica da sua plataforma e rastreie erros em tempo real."

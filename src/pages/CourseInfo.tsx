@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const CourseInfo = () => {
   const { courseId } = useParams();
@@ -70,7 +71,8 @@ const CourseInfo = () => {
 
   return (
     <div className="min-h-screen pb-20">
-      <main className="container mx-auto px-4 py-8">
+      <main>
+        <PageContainer className="py-8">
         {/* Back Button */}
         <Button
           variant="ghost"
@@ -82,7 +84,7 @@ const CourseInfo = () => {
         </Button>
 
         {/* Course Info - Premium Layout */}
-        <div className="max-w-6xl mx-auto space-y-12 animate-fade-in">
+        <div className="space-y-12 animate-fade-in">
 
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
 
@@ -243,6 +245,7 @@ const CourseInfo = () => {
             </div>
           </div>
         </div>
+        </PageContainer>
       </main>
     </div>
   );

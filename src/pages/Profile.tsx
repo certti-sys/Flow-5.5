@@ -13,6 +13,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/ca
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { PageContainer } from "@/components/layout/PageContainer";
 import { motion } from "framer-motion";
 
 const Profile = () => {
@@ -116,23 +117,18 @@ const Profile = () => {
 
   // Calculate courses in progress with accurate data
   const coursesWithProgress = useMemo(() => {
-    const courseProgressMap = new Map<string, { completed: number; total: number }>();
-
-    // Count completed lessons per course using the direct course_id
-    userProgress.forEach((p: any) => {
-      const courseId = p.course_id;
-      if (courseId && p.completed) {
-        const current = courseProgressMap.get(courseId) || { completed: 0, total: 0 };
-        courseProgressMap.set(courseId, { ...current, completed: current.completed + 1 });
-      }
-    });
-
-    // Map courses with progress
+    // Map courses with progress by matching user_progress.lesson_id to the course lessons
     return allCourses
       .map((course: any) => {
-        const totalLessons = course.modules?.reduce((acc: number, mod: any) =>
-          acc + (mod.lessons?.length || 0), 0) || 0;
-        const completedLessons = courseProgressMap.get(course.id)?.completed || 0;
+        const lessonIds = new Set<string>(
+          course.modules?.flatMap((module: any) =>
+            (module.lessons || []).map((lesson: any) => lesson.id)
+          ) || []
+        );
+        const totalLessons = lessonIds.size;
+        const completedLessons = userProgress.filter(
+          (p: any) => p.completed && p.lesson_id && lessonIds.has(p.lesson_id)
+        ).length;
 
         // Only include courses user has started
         if (completedLessons === 0) return null;
@@ -175,11 +171,12 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-8 pb-20 space-y-6"
-      >
+      <PageContainer>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="pb-20 space-y-6"
+        >
         <AdminHeader
           title="Meu Perfil"
           description="Acompanhe seu progresso, conquistas e as informações da sua conta."
@@ -385,6 +382,7 @@ const Profile = () => {
           </div>
         </div>
       </motion.div>
+      </PageContainer>
 
       <EditProfileModal
         open={isEditModalOpen}

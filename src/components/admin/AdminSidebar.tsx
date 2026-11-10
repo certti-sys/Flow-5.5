@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   BookOpen,
   Users,
-  Settings,
   Palette,
   Images,
   Bell,
@@ -21,13 +20,18 @@ import {
   CreditCard,
   TrendingUp,
   UserCheck,
-  Tag
+  Tag,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlatformSettingsContext } from "@/components/PlatformSettingsProvider";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
   Sidebar,
@@ -87,12 +91,26 @@ const appearanceItems = [
 ];
 
 export function AdminSidebar() {
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, toggleSidebar } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { settings } = usePlatformSettingsContext();
   const collapsed = isMobile ? false : state === "collapsed";
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("name, avatar_url")
+        .eq("id", user.id)
+        .single();
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   const handleLogout = async () => {
     await signOut();
@@ -108,44 +126,39 @@ export function AdminSidebar() {
 
   const renderMenuItems = (items: typeof overviewItems) => (
     <SidebarMenu>
-      {items.map((item) => (
-        <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton
-            asChild
-            isActive={isActive(item.url)}
-            tooltip={collapsed ? item.title : undefined}
-          >
-            <NavLink
-              to={item.url}
-              end={item.url === "/admin"}
-              className={cn(
-                "flex items-center gap-2",
-                isActive(item.url)
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-white/50 hover:bg-white/5 hover:text-white"
-              )}
+      {items.map((item) => {
+        const active = isActive(item.url);
+        return (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton
+              asChild
+              tooltip={collapsed ? item.title : undefined}
+              className={
+                active
+                  ? "bg-primary text-primary-foreground shadow-md hover:bg-primary hover:text-primary-foreground"
+                  : "text-white/50 hover:text-white hover:bg-white/5"
+              }
             >
-              <item.icon className="h-4 w-4 text-white/50 transition-colors group-hover:text-primary" />
-              {!collapsed && (
-                <span className={cn(
-                  "text-xs sm:text-sm font-medium",
-                  isActive(item.url) ? "text-primary font-bold" : "text-white/50"
-                )}>
-                  {item.title}
-                </span>
-              )}
-            </NavLink>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+              <NavLink
+                to={item.url}
+                end={item.url === "/admin"}
+                className="flex items-center gap-2"
+              >
+                <item.icon className="h-4 w-4" />
+                {!collapsed && <span>{item.title}</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        );
+      })}
     </SidebarMenu>
   );
 
   return (
-    <Sidebar collapsible={isMobile ? "offcanvas" : "icon"} className="border-r border-white/10 bg-white/5 backdrop-blur-md">
+    <Sidebar collapsible={isMobile ? "offcanvas" : "icon"} className="border-r border-white/[0.1] bg-sidebar/95 backdrop-blur-md">
       {/* Header with Logo */}
-      <SidebarHeader className="border-b border-white/5 px-4 py-4">
-        <div className={cn("flex items-center gap-2", settings.logo_display_mode === 'horizontal' && "justify-center w-full")}>
+      <SidebarHeader className="border-b border-white/[0.1] px-4 py-4">
+        <div className={cn("flex items-center gap-2.5", settings.logo_display_mode === 'horizontal' && "justify-center w-full")}>
           {settings.logo_display_mode === 'horizontal' && settings.logo_horizontal_url ? (
             <img
               src={settings.logo_horizontal_url}
@@ -158,15 +171,15 @@ export function AdminSidebar() {
                 <img
                   src={settings.logo_image_url}
                   alt="Logo"
-                  className="h-6 w-6 object-contain"
+                  className="w-8 h-8 rounded-lg object-cover shrink-0"
                 />
               ) : (
-                <div className="w-6 h-6 rounded-lg gradient-primary flex items-center justify-center">
-                  <GraduationCap className="h-4 w-4 text-white" />
+                <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-4 h-4 text-white" />
                 </div>
               )}
               {!collapsed && (
-                <span className="font-semibold text-white tracking-tight">
+                <span className="font-bold text-base text-foreground tracking-tight truncate">
                   {settings.logo_text || "EduStream"}
                 </span>
               )}
@@ -174,6 +187,51 @@ export function AdminSidebar() {
           )}
         </div>
       </SidebarHeader>
+
+      {/* User Profile Section */}
+      <div className={`border-b border-white/[0.1] ${collapsed ? 'px-2 py-4' : 'px-3 py-4'}`}>
+        {collapsed ? (
+          <div className="relative flex justify-center">
+            <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+              <AvatarImage src={profile?.avatar_url || ""} alt={profile?.name || "Administrador"} />
+              <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                {profile?.name?.charAt(0)?.toUpperCase() || "A"}
+              </AvatarFallback>
+            </Avatar>
+            <button
+              onClick={toggleSidebar}
+              className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-primary text-primary-foreground shadow-md flex items-center justify-center hover:opacity-90 transition-opacity"
+              aria-label="Expandir sidebar"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-white/5 border border-white/[0.08] p-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Avatar className="h-11 w-11 ring-2 ring-primary/20 shrink-0">
+                <AvatarImage src={profile?.avatar_url || ""} alt={profile?.name || "Administrador"} />
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {profile?.name?.charAt(0)?.toUpperCase() || "A"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm text-foreground leading-tight truncate">
+                  {profile?.name || "Administrador"}
+                </p>
+                <p className="text-[10px] text-white/40 truncate">{user?.email || "Painel administrativo"}</p>
+              </div>
+              <button
+                onClick={toggleSidebar}
+                className="h-7 w-7 shrink-0 rounded-lg bg-white/5 hover:bg-white/10 border border-white/[0.08] flex items-center justify-center text-white/60 transition-colors"
+                aria-label="Recolher sidebar"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <SidebarContent>
         {/* Back to Client Area */}
@@ -190,11 +248,9 @@ export function AdminSidebar() {
                     to="/dashboard"
                     className="flex items-center gap-2"
                   >
-                    <Home className="h-4 w-4 text-white/50 group-hover:text-primary transition-colors" />
+                    <Home className="h-4 w-4" />
                     {!collapsed && (
-                      <span className="text-xs sm:text-sm font-medium text-white/50 group-hover:text-primary transition-colors">
-                        Área do Aluno
-                      </span>
+                      <span>Área do Aluno</span>
                     )}
                   </NavLink>
                 </SidebarMenuButton>
@@ -205,7 +261,7 @@ export function AdminSidebar() {
 
         {/* 1. Visão Geral */}
         <SidebarGroup>
-          <SidebarGroupLabel>Visão Geral</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3">Visão Geral</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(overviewItems)}
           </SidebarGroupContent>
@@ -213,7 +269,7 @@ export function AdminSidebar() {
 
         {/* 2. Acadêmico */}
         <SidebarGroup>
-          <SidebarGroupLabel>Acadêmico</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3">Acadêmico</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(academicItems)}
           </SidebarGroupContent>
@@ -221,7 +277,7 @@ export function AdminSidebar() {
 
         {/* 3. Comercial */}
         <SidebarGroup>
-          <SidebarGroupLabel>Comercial</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3">Comercial</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(commercialItems)}
           </SidebarGroupContent>
@@ -229,7 +285,7 @@ export function AdminSidebar() {
 
         {/* 6. Aparência & Design */}
         <SidebarGroup>
-          <SidebarGroupLabel>Aparência & Design</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3">Aparência & Design</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(appearanceItems)}
           </SidebarGroupContent>
@@ -237,7 +293,7 @@ export function AdminSidebar() {
 
         {/* 4. Canais de Comunicação */}
         <SidebarGroup>
-          <SidebarGroupLabel>Canais de Comunicação</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3">Canais de Comunicação</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(communicationItems)}
           </SidebarGroupContent>
@@ -245,23 +301,23 @@ export function AdminSidebar() {
 
         {/* 5. Configurações do Sistema */}
         <SidebarGroup>
-          <SidebarGroupLabel>Configurações do Sistema</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-white/40 px-3">Configurações do Sistema</SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(systemItems)}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-white/10 p-4">
+      <SidebarFooter className="border-t border-white/[0.1] p-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={handleLogout}
               tooltip={collapsed ? "Sair" : undefined}
-              className="text-white/50 hover:text-white hover:bg-white/5"
+              className="text-white/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
             >
-              <LogOut className="h-4 w-4 text-white/50 group-hover:text-destructive transition-colors" />
-              {!collapsed && <span className="font-medium text-white/50 group-hover:text-destructive">Sair</span>}
+              <LogOut className="h-4 w-4" />
+              {!collapsed && <span>Sair</span>}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
